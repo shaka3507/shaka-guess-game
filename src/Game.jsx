@@ -12,6 +12,7 @@ function Game() {
   const [userPlays, setUserPlays] = useState(0)
   const [status, setStatus] = useState('')
   const [gamesWon, setGamesWon] = useState(0)
+  const [gamesLoss, setGamesLoss] = useState(0)
   const [guessSum, setGuessSum] = useState(0)
   const [settings, setSettings] = useState({
     min: 0,
@@ -42,6 +43,7 @@ function Game() {
     // checks to ensure user only plays with chances allocated for game
     if(userPlays - settings.chance === 0) {
       setGameOver(true)
+      setGamesLoss(gamesLoss + 1)
       setStatus('game over')
     }
   }, [userPlays])
@@ -72,9 +74,15 @@ function Game() {
 
   useEffect(() => {
     if(status.includes('won')) {
-      let currentStats = getItemLocalStorage('stats') || { gamePlayCount: [], gamesWon: 0 }
+      let currentStats = getItemLocalStorage('stats') || { gamePlayCount: [], gamesWon: 0, gamesLoss: 0 }
       currentStats.gamePlayCount = [...currentStats.gamePlayCount, userPlays]
       currentStats.gamesWon = currentStats.gamesWon + 1
+      saveItemLocalStorage('stats', currentStats)
+    }
+
+    if(status.includes('over')) {
+      let currentStats = getItemLocalStorage('stats') || { gamePlayCount: [], gamesWon: 0, gamesLoss: 0 }
+      currentStats.gamesLoss = currentStats.gamesLoss + 1
       saveItemLocalStorage('stats', currentStats)
     }
     

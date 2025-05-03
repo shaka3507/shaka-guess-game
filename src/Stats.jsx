@@ -1,14 +1,18 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { getItemLocalStorage, deleteItemLocalStoragez } from './localStorage.js'
+import { getItemLocalStorage, deleteItemLocalStorage } from './localStorage.js'
 
 export default function Stats(){
 	const [winCount, setWinCount] = useState(0)
 	const [avg, setAvg] = useState(0)
+	const [loss, setLoss] = useState(0)
 	useEffect(() => {
 		const savedStats = getItemLocalStorage('stats')
 		if(savedStats.gamesWon) {
 			setWinCount(savedStats.gamesWon)
+		}
+		if(savedStats.gamesLoss) {
+			setLoss(savedStats.gamesLoss)
 		}
 		if(savedStats.gamePlayCount) {
 			const { gamePlayCount } = savedStats
@@ -28,6 +32,7 @@ export default function Stats(){
 		deleteItemLocalStorage('stats')
 		setAvg(0)
 		setWinCount(0)
+		setLoss(0)
 	}
 	return (
 	<div>
@@ -40,6 +45,9 @@ export default function Stats(){
 		</div>
 		<div className="card">
 			<h3>On average it takes you <span className="emphasis-stat">{avg}</span> guesses</h3>
+		</div>
+		<div className="card">
+			<h3>And the number of L's... <span className="emphasis-stat">{loss}</span></h3>
 		</div>
 		<button onClick={reset}>reset stats</button>
 	</div>)
