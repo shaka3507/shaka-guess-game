@@ -1,8 +1,46 @@
-export default function Stats({ gamesWon = 0, avgGuesses = 0 }){
-	return (<div>
-		<h1>your stats</h1>
+import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { getItemLocalStorage, deleteItemLocalStoragez } from './localStorage.js'
 
-		<h3>games won: {gamesWon}</h3>
-		<h3>average guesses: {avgGuesses}</h3>
+export default function Stats(){
+	const [winCount, setWinCount] = useState(0)
+	const [avg, setAvg] = useState(0)
+	useEffect(() => {
+		const savedStats = getItemLocalStorage('stats')
+		if(savedStats.gamesWon) {
+			setWinCount(savedStats.gamesWon)
+		}
+		if(savedStats.gamePlayCount) {
+			const { gamePlayCount } = savedStats
+			let avgCalc = 0
+			let len = gamePlayCount.length
+			console.log("savedS", savedStats.gamePlayCount)
+			for(let i = 0; i < len; i++) {
+				avgCalc += gamePlayCount[i]
+			}
+			// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round
+			let result = Math.round(avgCalc/len * 100) / 100
+			setAvg(result)
+		}
+	}, [])
+
+	const reset = () => {
+		deleteItemLocalStorage('stats')
+		setAvg(0)
+		setWinCount(0)
+	}
+	return (
+	<div>
+		<div className="nav">
+			<Link to="/">back to game </Link>
+		</div>
+		<h1>stats &#128202;</h1>
+		<div className="card">
+			<h3>congrats, you won <span className="emphasis-stat">{winCount}</span> games so far!</h3>
+		</div>
+		<div className="card">
+			<h3>On average it takes you <span className="emphasis-stat">{avg}</span> guesses</h3>
+		</div>
+		<button onClick={reset}>reset stats</button>
 	</div>)
 }

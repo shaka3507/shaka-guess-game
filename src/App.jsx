@@ -4,8 +4,18 @@ import Game from './Game.jsx'
 import Settings from './Settings.jsx'
 import Stats from './Stats.jsx'
 
+
+export const Nav = ({ gameData, statsData }) => {
+	return (
+		<ul id='main-nav'>
+			<li><Link to="/">Game</Link></li>
+			<li><Link to="/settings">Settings</Link></li>
+		</ul>
+	);
+}
+
 export default function App() {
-  
+
 	return (
 		<BrowserRouter>
 			<Routes>
