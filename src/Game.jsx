@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+
 import GameStatus from './GameStatus'
-import './App.css'
-import { Nav } from './App.jsx'
-import { getItemLocalStorage, saveItemLocalStorage } from './localStorage.js'
+import Nav from './Nav.jsx'
+import { saveItemLocalStorage, getItemLocalStorage, deleteItemLocalStorage } from './localStorageUtil.js'
+
 
 function Game() {
   const [num, setNum] = useState(null)
@@ -25,8 +26,22 @@ function Game() {
     const savedSettings = getItemLocalStorage('settings')
     if(savedSettings) {
       setSettings(savedSettings)
+    } else {
+      // save default
+      saveItemLocalStorage('settings', settings)
+    }
+
+    const gameState = getItemLocalStorage('game-state')
+    if(gameState) {
+      const { guessPlayNo, userPlays, currentGuess } = gameState
+      setNum(guessPlayNo)
+      setUserPlays(userPlays)
+      setGuess(currentGuess)
+
     }
   }, [])
+
+
   
   useEffect(() => {
     if(!num) {
@@ -38,15 +53,6 @@ function Game() {
       setNum(guessNum)
     }
   }, [num, settings.min])
-
-  useEffect(() => {
-    // checks to ensure user only plays with chances allocated for game
-    if(userPlays - settings.chance === 0) {
-      setGameOver(true)
-      setGamesLoss(gamesLoss + 1)
-      setStatus('game over')
-    }
-  }, [userPlays])
 
   const trackGuess = (e) => setGuess(e.target.value)
 
@@ -64,49 +70,67 @@ function Game() {
     }
   }
 
-  const resetGame = () => {
-    setGameOver(false)
-    setNum(null)
-    setStatus('')
-    setUserPlays(0)
-    setGuess(0)
-  }
-
   useEffect(() => {
     if(status.includes('won')) {
       let currentStats = getItemLocalStorage('stats') || { gamePlayCount: [], gamesWon: 0, gamesLoss: 0 }
       currentStats.gamePlayCount = [...currentStats.gamePlayCount, userPlays]
       currentStats.gamesWon = currentStats.gamesWon + 1
       saveItemLocalStorage('stats', currentStats)
+      deleteItemLocalStorage('game-state')
     }
 
     if(status.includes('over')) {
       let currentStats = getItemLocalStorage('stats') || { gamePlayCount: [], gamesWon: 0, gamesLoss: 0 }
       currentStats.gamesLoss = currentStats.gamesLoss + 1
       saveItemLocalStorage('stats', currentStats)
+      deleteItemLocalStorage('game-state')
     }
     
   }, [status])
 
+  useEffect(() => {
+    if(userPlays > 0) {
+      saveItemLocalStorage('game-state', { userPlays, guessPlayNo: num, currentGuess: guess })
+    }
+    // checks to ensure user only plays with chances allocated for game
+    if(userPlays - settings.chance === 0) {
+      setGameOver(true)
+      setGamesLoss(gamesLoss + 1)
+      setStatus('game over')
+    } else if (userPlays - settings.chance === 0 && Number(guess) === num) {
+      setStatus('winner!')
+    }
+  }, [userPlays])
+
+  const resetGame = () => {
+    setGameOver(false)
+    setNum(null)
+    setStatus('')
+    deleteItemLocalStorage('game-state')
+    setUserPlays(0)
+    setGuess(0)
+  }
+
+
   return (
     <>
-      <div className="nav">
+      <Nav>
         <Link to="/stats">Stats</Link>
         <Link to="/settings">Settings</Link>
-      </div>
+      </Nav>
       <div className="game">
-      <h1>take a chance &#9860;</h1>
-      {gameOver && `mystery number is ${num}`}
-      <div>
-        <div id="guess-num">{num}</div>
-        <p>what number am i thinking of?</p>
-        <GameStatus status={status} chances={userPlays} maxChances={settings.chance} />
-        <input type="text" maxLength="3" onChange={trackGuess} value={guess} />
-        <br />
-        <button disabled={gameOver} onClick={evaluateGuess}>GUESS</button>
-        <br />
-        {gameOver && <button onClick={resetGame}>reset game </button>}
-      </div>
+        <h1>take a chance &#9860;</h1>
+        {gameOver && `mystery number is ${num}`}
+        <div>
+          <div id="guess-num">{num}</div>
+            {!gameOver && <p>what number am i thinking of?</p>}
+            <GameStatus status={status} chances={userPlays} maxChances={settings.chance} />
+            <input type="text" maxLength="3" onChange={trackGuess} value={guess} />
+            <br />
+            <button id="guess-btn" disabled={gameOver} onClick={evaluateGuess}>GUESS</button>
+            <br />
+            {gameOver && <button onClick={resetGame}>reset game</button>}
+          </div>
       </div>
     </>
   )

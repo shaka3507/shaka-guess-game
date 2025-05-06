@@ -1,13 +1,15 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { getItemLocalStorage, deleteItemLocalStorage } from './localStorage.js'
+
+import { saveItemLocalStorage, getItemLocalStorage, deleteItemLocalStorage } from './localStorageUtil.js'
+import StatsCard from './StatsCard.jsx'
 
 export default function Stats(){
 	const [winCount, setWinCount] = useState(0)
 	const [avg, setAvg] = useState(0)
 	const [loss, setLoss] = useState(0)
 	useEffect(() => {
-		const savedStats = getItemLocalStorage('stats')
+		const savedStats = getItemLocalStorage('stats') || { gamesWon: 0, gamesLoss: 0, gamePlayCount: []}
 		if(savedStats.gamesWon) {
 			setWinCount(savedStats.gamesWon)
 		}
@@ -18,7 +20,10 @@ export default function Stats(){
 			const { gamePlayCount } = savedStats
 			let avgCalc = 0
 			let len = gamePlayCount.length
-			console.log("savedS", savedStats.gamePlayCount)
+			if(len === 0) {
+				setAvg(0)
+				return
+			}
 			for(let i = 0; i < len; i++) {
 				avgCalc += gamePlayCount[i]
 			}
@@ -30,25 +35,22 @@ export default function Stats(){
 
 	const reset = () => {
 		deleteItemLocalStorage('stats')
+		deleteItemLocalStorage('game-state')
+		deleteItemLocalStorage('settings')
 		setAvg(0)
 		setWinCount(0)
 		setLoss(0)
 	}
 	return (
-	<div>
-		<div className="nav">
-			<Link to="/">back to game </Link>
+		<div>
+			<div className="nav">
+				<Link to="/"> back to game </Link>
+			</div>
+			<h1>stats &#128202;</h1>
+			<StatsCard stat={winCount} description="Game win count: "/>
+			<StatsCard stat={avg} description="Average guesses count to win: "/>
+			<StatsCard stat={loss} description="Game loss count: "/>
+			<button className="reset-btn" onClick={reset}>CLEAR SAVED DATA</button>
 		</div>
-		<h1>stats &#128202;</h1>
-		<div className="card">
-			<h3>congrats, you won <span className="emphasis-stat">{winCount}</span> games so far!</h3>
-		</div>
-		<div className="card">
-			<h3>On average it takes you <span className="emphasis-stat">{avg}</span> guesses</h3>
-		</div>
-		<div className="card">
-			<h3>And the number of L's... <span className="emphasis-stat">{loss}</span></h3>
-		</div>
-		<button onClick={reset}>reset stats</button>
-	</div>)
+	)
 }
