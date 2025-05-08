@@ -11,38 +11,8 @@ export default function Settings() {
 	const [gameSettings, setGamesSettings] = useState('')
 	const [gameInProgress, setGameInProgress] = useState(false)
 	const [error, setError] = useState('')
-	const onMaxChange = (e) => {
-		if(e.target.value >=0 && e.target.value !== min) {
-			setMax(e.target.value)
-			if (error) setError('')
-		} else if (e.target.value === min) {
-			setError('The max and min number cannot be the same')
-		} else {
-			setError('The maximum cannot be less than 0')
-		}
-	}
-	const onMinChange = (e) => {
-		// only allow positive numbers or 0
-		// shows error message if user tries to make mininum number negative
-		if(e.target.value >= 0 && e.target.value !== max) {
-			setMin(e.target.value)
-			if (error) setError('')
-		} else if (e.target.value === max){
-			setError('The max and min number cannot be the same')
-		} else {
-			setError('The minimum cannot be less than 0')
-		}
 
-	}
-	const onChanceChange = (e) => {
-		if(e.target.value < 1) {
-			setError('User must get at least 1 chance')
-		} else {
-			setChance(e.target.value)
-			setError('')
-		}
-	}
-
+	// retrieves previous saved settings or state
 	useEffect(() => {
 		const settings = getItemLocalStorage('settings')
 		const gameState = getItemLocalStorage('game-state') || null
@@ -68,6 +38,39 @@ export default function Settings() {
 	useEffect(() => {
 		saveItemLocalStorage('settings', { min, max, chance })
 	}, [min, max, chance])
+
+	const onMaxChange = (e) => {
+		if(e.target.value >=0 && e.target.value !== min) {
+			setMax(e.target.value)
+			if (error) setError('')
+		} else if (e.target.value === min) {
+			setError('The max and min number cannot be the same')
+		} else {
+			setError('The maximum cannot be less than 0')
+		}
+	}
+	
+	const onMinChange = (e) => {
+		// only allow positive numbers or 0
+		// shows error message if user tries to make mininum number negative
+		if(e.target.value >= 0 && e.target.value !== max) {
+			setMin(e.target.value)
+			if (error) setError('')
+		} else if (e.target.value === max){
+			setError('The max and min number cannot be the same')
+		} else {
+			setError('The minimum cannot be less than 0')
+		}
+
+	}
+	const onChanceChange = (e) => {
+		if(e.target.value < 1) {
+			setError('User must get at least 1 chance')
+		} else {
+			setChance(e.target.value)
+			setError('')
+		}
+	}
 
 	// for users who want to reset game from settings page
 	const resetGame = () => {

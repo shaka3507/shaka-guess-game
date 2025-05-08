@@ -12,7 +12,6 @@ function Game() {
   const [gameOver, setGameOver] = useState(false)
   const [userPlays, setUserPlays] = useState(0)
   const [status, setStatus] = useState('')
-  const [gamesWon, setGamesWon] = useState(0)
   const [gamesLoss, setGamesLoss] = useState(0)
   const [guessSum, setGuessSum] = useState(0)
   const [settings, setSettings] = useState({
@@ -31,19 +30,21 @@ function Game() {
       saveItemLocalStorage('settings', settings)
     }
 
+    // if game state present from local storage, use it
     const gameState = getItemLocalStorage('game-state')
+
     if(gameState) {
       const { guessPlayNo, userPlays, currentGuess } = gameState
       setNum(guessPlayNo)
       setUserPlays(userPlays)
       setGuess(currentGuess)
-
     }
   }, [])
 
 
   
   useEffect(() => {
+    // set random number to guess if none exists
     if(!num) {
       // uses min and max to get random number
       const random = Math.floor(Math.random(settings.min) * settings.max)
@@ -65,22 +66,22 @@ function Game() {
     } else if (Number(guess) === num){
       setStatus('won')
       setGameOver(true)
-      setGamesWon(gamesWon + 1)
       setGuessSum(guessSum + userPlays)
     }
   }
 
   useEffect(() => {
+    // if game is over and status has been set
     if(status.includes('won')) {
-      let currentStats = getItemLocalStorage('stats') || { gamePlayCount: [], gamesWon: 0, gamesLoss: 0 }
-      currentStats.gamePlayCount = [...currentStats.gamePlayCount, userPlays]
-      currentStats.gamesWon = currentStats.gamesWon + 1
+      // when a player has won, add to gamePlay array which keeps track of # of guesses for each winning round
+      let currentStats = getItemLocalStorage('stats') || { winningGameGuessCount: [], gamesLoss: 0 }
+      currentStats.winningGameGuessCount = [...currentStats.winningGameGuessCount, userPlays]
       saveItemLocalStorage('stats', currentStats)
       deleteItemLocalStorage('game-state')
     }
 
     if(status.includes('over')) {
-      let currentStats = getItemLocalStorage('stats') || { gamePlayCount: [], gamesWon: 0, gamesLoss: 0 }
+      let currentStats = getItemLocalStorage('stats') || { winningGameGuessCount: [], gamesLoss: 0 }
       currentStats.gamesLoss = currentStats.gamesLoss + 1
       saveItemLocalStorage('stats', currentStats)
       deleteItemLocalStorage('game-state')
@@ -103,10 +104,10 @@ function Game() {
   }, [userPlays])
 
   const resetGame = () => {
+    deleteItemLocalStorage('game-state')
     setGameOver(false)
     setNum(null)
     setStatus('')
-    deleteItemLocalStorage('game-state')
     setUserPlays(0)
     setGuess(0)
   }
