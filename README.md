@@ -1,12 +1,15 @@
-# React + Vite - guessing game
+# Guessing Game
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Changed Files
 
-Currently, two official plugins are available:
+- App.jsx: for handling routing for the app
+- Game.jsx: for the actual game component - saves current game state and reads from local storage for settings and stats
+- Settings.jsx: for the settings view. Also allows player to reset game, if they want to change the game during an ongoing game. Also includes error messaging for user who tries to make min or max number below zero, the same number or chances <= 0.
+- Stats.jsx: For tracking the number of games won, the average plays it takes the player to win, and game loss count
+- StatsCard: Child component for Stats to show a stats acard
+- localStorageUtil.js: functions available to be imported into each component for getting, saving and deleting local storage keys for settings, stats and game state
+- GameStatus.jsx: component for displaying the current state of the game
+- App.css and index.css: includes all css changes from original vite project.
+- Nav.jsx: File for shared nav bar across views
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

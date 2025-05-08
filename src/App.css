@@ -37,6 +37,8 @@
   color: black;
 }
 
+/*used on settings page*/
+
 .error-container {
   margin-top: 20px;
   display: flex;
@@ -69,10 +71,6 @@
 #guess-btn {
   background-color: lightgreen;
   color: black;
-}
-
-input {
-  text-align: center;
 }
 
 .card {
